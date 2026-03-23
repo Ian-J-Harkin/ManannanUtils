@@ -1,0 +1,26 @@
+# Python
+.venv/
+__pycache__/
+*.pyc
+*.pyo
+
+# Private working documents
+FINE_TUNING_GUIDE.md
+PROMPT_INFRASTRUCTURE.md
+PROMPT_SYSTEM_RULES.md
+PROMPT_GRAMMAR_RULES.md
+PROMPT_INITIAL_PATCH_LIST.md
+PROMPT_LEARNING_LOOP.md
+WAYPOINT.md
+TASK Systematize OCR Corrections fo.txt
+
+# Fine-tuning data
+finetune.json
+finetune2.json
+finetune3.json
+
+# Large PDF source files
+*.pdf
+
+# OS
+.DS_Store
