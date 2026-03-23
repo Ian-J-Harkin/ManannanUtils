@@ -1,14 +1,16 @@
 import streamlit as st
-import subprocess
 import os
 import sys
-import json
 import tkinter as tk
 from tkinter import filedialog
 
-# Configuration - Targeted at the local project structure
-DEFAULT_DATA_ROOT = r"C:\github\Manannan"
-DEFAULT_UTILS_ROOT = r"C:\github\ManannanUtils"
+# Ensure ui directory is in path so we can import engine
+sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+from engine import DigitizationEngine
+
+# Configuration - Initialized via engine
+if 'engine' not in st.session_state:
+    st.session_state.engine = DigitizationEngine()
 
 st.set_page_config(
     page_title="Manannán Digitization Lab", 
@@ -21,15 +23,17 @@ with st.sidebar:
     st.image("https://img.icons8.com/wired/64/000000/ufo.png", width=50)
     st.title("⚙️ Workspace Settings")
     
-    st.session_state.data_root = st.text_input("📊 Data Root", value=st.session_state.get('data_root', DEFAULT_DATA_ROOT))
-    st.session_state.utils_root = st.text_input("🛠️ Toolkit Root", value=st.session_state.get('utils_root', DEFAULT_UTILS_ROOT))
+    new_data_root = st.text_input("📊 Data Root", value=st.session_state.engine.data_root)
+    
+    if st.button("💾 Save Settings", use_container_width=True):
+        st.session_state.engine.save_config(new_data_root)
+        st.success("Settings saved to workspace config!")
+        st.rerun()
     
     st.divider()
     st.markdown("### 🔍 System Info")
     st.write(f"Python: `{sys.version.split(' ')[0]}`")
-    st.write(f"Venv: `{os.path.basename(sys.prefix)}`")
-
-UTILS_DIR = os.path.join(st.session_state.utils_root, "python-utils")
+    st.write(f"Environment: `{os.path.basename(sys.prefix)}`")
 
 # Custom Styling for Premium Wizard Look
 st.markdown("""
@@ -69,30 +73,23 @@ def go_to_step(n):
     st.session_state.step = n
 
 def select_file():
-    # Attempt native dialog
     try:
         root = tk.Tk()
         root.withdraw()
         root.attributes('-topmost', True)
         path = filedialog.askopenfilename(
-            initialdir=os.path.join(st.session_state.data_root, "caibidlí", "old-orthography"),
+            initialdir=st.session_state.engine.get_default_directory(),
             title="Select Chapter for Processing",
             filetypes=[("Markdown files", "*.md"), ("All files", "*.*")]
         )
         root.destroy()
         return path
     except Exception as e:
-        # Fallback for headless or error
         st.error(f"Native dialog failed: {e}")
         return None
 
 # --- Wizard UI Component ---
-stages = [
-    ("📁 Selection", 1),
-    ("✨ OCR Repair", 2),
-    ("📖 Modernize", 3),
-    ("✅ Verification", 4)
-]
+stages = [("📁 Selection", 1), ("✨ OCR Repair", 2), ("📖 Modernize", 3), ("✅ Verification", 4)]
 
 def render_wizard_header():
     cols = st.columns(len(stages))
@@ -141,38 +138,25 @@ elif st.session_state.step == 2:
     st.write(f"Working on: `{os.path.basename(st.session_state.selected_file)}`")
     
     if st.button("✨ Run OCR Fixer", type="primary", use_container_width=True):
-        report_path = os.path.join(UTILS_DIR, "temp_report.json")
-        cmd = [
-            sys.executable, 
-            os.path.join(UTILS_DIR, "ocr_fixer.py"), 
-            st.session_state.selected_file, 
-            "--report", report_path
-        ]
-        
         with st.spinner("Executing linguistic repair engine..."):
-            result = subprocess.run(cmd, capture_output=True, text=True, cwd=UTILS_DIR)
-            if result.returncode == 0:
+            success, stdout, stderr = st.session_state.engine.run_ocr_fixer(st.session_state.selected_file)
+            if success:
                 st.session_state.ocr_completed = True
                 st.success("OCR Fixer successful! Review the report below.")
-                if result.stderr:
+                if stderr:
                     with st.expander("Technical Logs"):
-                        st.code(result.stderr)
+                        st.code(stderr)
             else:
                 st.error("Engine failure:")
-                st.code(result.stderr)
+                st.code(stderr)
 
     if st.session_state.ocr_completed:
-        # Load report
-        report_file = os.path.join(UTILS_DIR, "temp_report.json")
-        if os.path.exists(report_file):
-            with open(report_file, 'r', encoding='utf-8') as f:
-                report_data = json.load(f)
-                matches = report_data.get("ambiguous_matches", [])
-                if matches:
-                    st.warning(f"Found {len(matches)} items requiring human attention.")
-                    st.table([{"Line": m['line'], "Word": m['word'], "Context": m['context']} for m in matches])
-                else:
-                    st.success("No ambiguous patterns detected.")
+        matches = st.session_state.engine.load_report()
+        if matches:
+            st.warning(f"Found {len(matches)} items requiring human attention.")
+            st.table([{"Line": m['line'], "Word": m['word'], "Context": m['context']} for m in matches])
+        else:
+            st.success("No ambiguous patterns detected.")
         
         st.divider()
         if st.button("Proceed to Modernization ➡️", type="primary"):
@@ -188,24 +172,15 @@ elif st.session_state.step == 3:
     st.subheader("Stage 3: Orthographic Modernization")
     st.write("Converting Cló Gaelach (dotted) characters to modern 'h' equivalents.")
     
-    output_path = st.session_state.selected_file.replace("old-orthography", "new-orthography")
-    
     if st.button("🛠️ Run Modernizer", type="primary", use_container_width=True):
-        cmd = [
-            sys.executable, 
-            os.path.join(UTILS_DIR, "convert_orthography.py"), 
-            st.session_state.selected_file, 
-            "--output", output_path
-        ]
-        
         with st.spinner("Performing character mapping..."):
-            result = subprocess.run(cmd, capture_output=True, text=True, cwd=UTILS_DIR)
-            if result.returncode == 0:
+            success, output_path, stderr = st.session_state.engine.run_modernizer(st.session_state.selected_file)
+            if success:
                 st.session_state.modernization_completed = True
                 st.success(f"Modernization complete! Saved to:\n`{output_path}`")
             else:
                 st.error("Modernizer failed:")
-                st.code(result.stderr)
+                st.code(stderr)
 
     if st.session_state.modernization_completed:
         if st.button("Proceed to Verification ➡️", type="primary"):
@@ -222,14 +197,10 @@ elif st.session_state.step == 4:
     st.balloons()
     st.success("Processing complete for this chapter.")
     
-    output_dir = os.path.join(st.session_state.data_root, "caibidlí", "new-orthography")
-    
     col1, col2 = st.columns(2)
     with col1:
         if st.button("📂 Open Output Folder", use_container_width=True):
-            if os.path.exists(output_dir):
-                os.startfile(output_dir)
-            else:
+            if not st.session_state.engine.open_output_folder():
                 st.error("Folder not found.")
     
     with col2:

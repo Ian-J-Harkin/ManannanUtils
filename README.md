@@ -105,10 +105,15 @@ The dashboard uses `tkinter` for native file browsing.
 
 *Note: Scripts should be run from the `python-utils` directory to ensure configuration paths are resolved correctly.*
 
-**1. Streamlit Digitization Lab (Recommended):**
+**1. Graphical Digitization Lab (Recommended):**
 The primary mission-control dashboard. It offers a guided **Wizard UI** for chapter processing and automatic path-handling.
+ 
+You can launch it safely from the project root. It will default to the robust **Streamlit** interface:
+```bash
 cd C:\github\ManannanUtils
-streamlit run python-utils/streamlit_app.py
+python launch_gui.py
+```
+*Note: To run the lightweight native Tkinter alternative instead, use `python launch_gui.py --ui tkinter`.*
 
 **2. Apply OCR Fixes (CLI):**
 ```bash

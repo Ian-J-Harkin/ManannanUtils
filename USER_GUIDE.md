@@ -29,18 +29,18 @@ Before launching the lab for the first time, prepare your environment:
 ---
  
 ## 🚀 Getting Started
-
+ 
 To launch the dashboard, open your terminal and run:
-
+ 
 ```powershell
 # Navigate to the Toolkit root
 cd C:\github\ManannanUtils
-
-# Run the app
-streamlit run python-utils/streamlit_app.py
+ 
+# Launch the Graphical UI (Defaults to Streamlit)
+python launch_gui.py
 ```
-
-*Note: Ensure you are using the correct Python environment where Streamlit is installed.*
+ 
+*Note: The platform features two fully interchangeable interfaces powered by the same pipeline engine. You can test the desktop-native Tkinter version by running `python launch_gui.py --ui tkinter`.*
 
 ---
 
