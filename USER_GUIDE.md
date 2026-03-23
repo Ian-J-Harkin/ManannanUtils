@@ -1,4 +1,6 @@
 # 📖 User Guide: Manannán Digitization Lab
+ 
+![Digitization Lab Interface Preview](assets/dashboard_screenshot.png)
 
 Welcome to the **Manannán Digitization Lab**. This tool is designed to simplify the complex task of modernizing 1940s Irish-language science fiction through an automated, intelligent pipeline.
 
@@ -9,8 +11,8 @@ Welcome to the **Manannán Digitization Lab**. This tool is designed to simplify
 To launch the dashboard, open your terminal and run:
 
 ```powershell
-# Navigate to the Data root
-cd C:\github\Manannan
+# Navigate to the Toolkit root
+cd C:\github\ManannanUtils
 
 # Run the app
 streamlit run python-utils/streamlit_app.py

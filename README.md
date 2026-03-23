@@ -1,4 +1,6 @@
 # 🌊 Manannán Digitization Project
+ 
+![Manannán Digitization Lab Dashboard](assets/dashboard_screenshot.png)
 
 [![Python Version](https://img.shields.io/badge/python-3.8+-blue.svg)](https://www.python.org/downloads/)
 [![Irish Language](https://img.shields.io/badge/Language-Irish%20%2F%20Gaeilge-green.svg)](#)
@@ -73,9 +75,8 @@ The pipeline is driven by a `corrections_dict.json` configuration that matures a
 
 **1. Streamlit Digitization Lab (Recommended):**
 The primary mission-control dashboard. It offers a guided **Wizard UI** for chapter processing and automatic path-handling.
-```bash
+cd C:\github\ManannanUtils
 streamlit run python-utils/streamlit_app.py
-```
 
 **2. Apply OCR Fixes (CLI):**
 ```bash
