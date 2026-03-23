@@ -20,7 +20,7 @@ st.set_page_config(
 
 # --- Sidebar Configuration ---
 with st.sidebar:
-    st.image("https://img.icons8.com/wired/64/000000/ufo.png", width=50)
+    st.markdown("<h1 style='text-align: center; font-size: 3rem;'>🛸</h1>", unsafe_allow_html=True)
     st.title("⚙️ Workspace Settings")
     
     new_data_root = st.text_input("📊 Data Root", value=st.session_state.engine.data_root)
