@@ -5,7 +5,29 @@
 Welcome to the **Manannán Digitization Lab**. This tool is designed to simplify the complex task of modernizing 1940s Irish-language science fiction through an automated, intelligent pipeline.
 
 ---
-
+ 
+## 🛠️ One-Time Setup
+ 
+Before launching the lab for the first time, prepare your environment:
+ 
+1. **Open Terminal**: Navigate to `C:\github\ManannanUtils`.
+2. **Create Environment**:
+   ```powershell
+   python -m venv .venv
+   ```
+3. **Activate & Install**:
+   ```powershell
+   # Windows
+   .venv\Scripts\activate
+   # macOS/Linux
+   source .venv/bin/activate
+ 
+   # Install Streamlit
+   pip install -r requirements.txt
+   ```
+ 
+---
+ 
 ## 🚀 Getting Started
 
 To launch the dashboard, open your terminal and run:

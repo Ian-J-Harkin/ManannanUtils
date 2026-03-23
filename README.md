@@ -53,7 +53,39 @@ The pipeline is driven by a `corrections_dict.json` configuration that matures a
 * **Fine-Tuning**: Rapid injection of new corrections directly into the pipeline via `fine_tune.py`.
 
 ---
-
+ 
+## 🛠️ Installation & Setup
+ 
+To use the tools in this repository, you should have **Python 3.8+** installed.
+ 
+### 1. Clone the Repositories
+Ensure you have both the data and the toolkit repositories on your local machine:
+```bash
+git clone https://github.com/Ian-J-Harkin/Manannan.git
+git clone https://github.com/Ian-J-Harkin/ManannanUtils.git
+```
+ 
+### 2. Set Up Virtual Environment (Recommended)
+Navigate to the `ManannanUtils` directory and create a virtual environment:
+```powershell
+# Create venv
+python -m venv .venv
+ 
+# Activate venv (Windows)
+.venv\Scripts\activate
+ 
+# Install dependencies
+pip install -r requirements.txt
+```
+*Note: Streamlit and its dependencies will be installed automatically from `requirements.txt`.*
+ 
+### 3. Native File Explorer Dependencies
+The dashboard uses `tkinter` for native file browsing.
+- **Windows**: Included with Python by default.
+- **macOS/Linux**: May require manual installation (e.g., `brew install python-tk` or `sudo apt-get install python3-tk`).
+ 
+---
+ 
 ## 📂 Project Structure
 
 ```bash
