@@ -71,12 +71,18 @@ The pipeline is driven by a `corrections_dict.json` configuration that matures a
 
 *Note: Scripts should be run from the `python-utils` directory to ensure configuration paths are resolved correctly.*
 
-**1. Apply OCR Fixes:**
+**1. Streamlit Digitization Lab (Recommended):**
+The primary mission-control dashboard. It offers a guided **Wizard UI** for chapter processing and automatic path-handling.
+```bash
+streamlit run python-utils/streamlit_app.py
+```
+
+**2. Apply OCR Fixes (CLI):**
 ```bash
 python python-utils/ocr_fixer.py caibidlí/old-orthography/manannan03.md --output caibidlí/old-orthography/manannan03_fixed.md
 ```
 
-**2. Modernize Orthography:**
+**3. Modernize Orthography (CLI):**
 ```bash
 python python-utils/convert_orthography.py caibidlí/old-orthography/manannan03_fixed.md --output caibidlí/new-orthography/manannan03.md
 ```
