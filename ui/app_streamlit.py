@@ -1,8 +1,7 @@
 import streamlit as st
 import os
 import sys
-import tkinter as tk
-from tkinter import filedialog
+import glob
 
 # Ensure ui directory is in path so we can import engine
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
@@ -24,9 +23,11 @@ with st.sidebar:
     st.title("⚙️ Workspace Settings")
     
     new_data_root = st.text_input("📊 Data Root", value=st.session_state.engine.data_root)
+    new_old_folder = st.text_input("📁 Input Folder", value=st.session_state.engine.old_folder)
+    new_new_folder = st.text_input("📦 Output Folder", value=st.session_state.engine.new_folder)
     
     if st.button("💾 Save Settings", use_container_width=True):
-        st.session_state.engine.save_config(new_data_root)
+        st.session_state.engine.save_config(new_data_root, new_old_folder, new_new_folder)
         st.success("Settings saved to workspace config!")
         st.rerun()
     
@@ -72,21 +73,13 @@ if 'modernization_completed' not in st.session_state:
 def go_to_step(n):
     st.session_state.step = n
 
-def select_file():
-    try:
-        root = tk.Tk()
-        root.withdraw()
-        root.attributes('-topmost', True)
-        path = filedialog.askopenfilename(
-            initialdir=st.session_state.engine.get_default_directory(),
-            title="Select Chapter for Processing",
-            filetypes=[("Markdown files", "*.md"), ("All files", "*.*")]
-        )
-        root.destroy()
-        return path
-    except Exception as e:
-        st.error(f"Native dialog failed: {e}")
-        return None
+def get_available_files():
+    """List .md files from the configured input directory."""
+    input_dir = st.session_state.engine.get_default_directory()
+    if os.path.isdir(input_dir):
+        files = sorted(glob.glob(os.path.join(input_dir, "*.md")))
+        return files
+    return []
 
 # --- Wizard UI Component ---
 stages = [("📁 Selection", 1), ("✨ OCR Repair", 2), ("📖 Modernize", 3), ("✅ Verification", 4)]
@@ -112,23 +105,33 @@ st.divider()
 # --- STAGE 1: Selection ---
 if st.session_state.step == 1:
     st.subheader("Stage 1: Chapter Source Selection")
-    st.info("Select a raw OCR output file from the `old-orthography` directory.")
+    st.info(f"Select a raw OCR output file from the `{st.session_state.engine.old_folder}` directory.")
     
-    col1, col2 = st.columns([3, 1])
-    with col1:
-        st.text_input("Active File", value=st.session_state.selected_file or "", disabled=True, placeholder="Please browse for a file...")
-    with col2:
-        if st.button("📁 Browse Local Files", use_container_width=True):
-            path = select_file()
-            if path:
-                st.session_state.selected_file = path
-                st.session_state.ocr_completed = False
-                st.session_state.modernization_completed = False
-                st.toast(f"Selected: {os.path.basename(path)}")
-                st.rerun()
+    available_files = get_available_files()
+    
+    if available_files:
+        display_names = [os.path.basename(f) for f in available_files]
+        selected_idx = st.selectbox(
+            "Available Chapters",
+            range(len(display_names)),
+            format_func=lambda i: display_names[i],
+            index=None,
+            placeholder="Select a chapter..."
+        )
+        if selected_idx is not None:
+            st.session_state.selected_file = available_files[selected_idx]
+    else:
+        st.warning(f"No `.md` files found in `{st.session_state.engine.get_default_directory()}`. Check your Workspace Settings or enter a path manually below.")
+    
+    manual_path = st.text_input("Or enter a file path manually:", value=st.session_state.selected_file or "")
+    if manual_path and os.path.isfile(manual_path):
+        st.session_state.selected_file = manual_path
 
     if st.session_state.selected_file:
+        st.success(f"Ready: `{os.path.basename(st.session_state.selected_file)}`")
         if st.button("Proceed to OCR Repair ➡️", type="primary"):
+            st.session_state.ocr_completed = False
+            st.session_state.modernization_completed = False
             go_to_step(2)
             st.rerun()
 

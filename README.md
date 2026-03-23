@@ -74,15 +74,25 @@ python -m venv .venv
 # Activate venv (Windows)
 .venv\Scripts\activate
  
-# Install dependencies
+# Install base dependencies (pytest only — for running tests)
 pip install -r requirements.txt
 ```
-*Note: Streamlit and its dependencies will be installed automatically from `requirements.txt`.*
  
-### 3. Native File Explorer Dependencies
-The dashboard uses `tkinter` for native file browsing.
-- **Windows**: Included with Python by default.
-- **macOS/Linux**: May require manual installation (e.g., `brew install python-tk` or `sudo apt-get install python3-tk`).
+### 3. Choose Your Interface
+
+The project offers **two fully interchangeable GUIs** powered by the same pipeline engine:
+
+| Feature | Tkinter (Desktop) | Streamlit (Web) |
+|---|---|---|
+| Extra dependencies | **None** (Python stdlib) | `pip install streamlit` |
+| Launch command | `python launch_gui.py --ui tkinter` | `python launch_gui.py --ui streamlit` |
+| File selection | Native OS file dialog | Dropdown + manual path |
+| Best for | Lightweight installs, offline use | Rich web UI, remote access |
+
+To install the optional Streamlit web UI:
+```bash
+pip install -r requirements-streamlit.txt
+```
  
 ---
  
@@ -96,6 +106,8 @@ The dashboard uses `tkinter` for native file browsing.
 ├── python-utils/           # Core toolset (Orthography conversion, OCR fixing, inspection).
 │   ├── config/             # corrections_dict.json and linguistic rules.
 │   └── ...scripts...
+├── ui/                     # GUI frontends (Streamlit & Tkinter) + shared engine.
+├── tests/                  # Unit tests (pytest).
 └── epub/                   # Tooling for digital edition building (Pandoc & custom CSS).
 ```
 
@@ -108,12 +120,12 @@ The dashboard uses `tkinter` for native file browsing.
 **1. Graphical Digitization Lab (Recommended):**
 The primary mission-control dashboard. It offers a guided **Wizard UI** for chapter processing and automatic path-handling.
  
-You can launch it safely from the project root. It will default to the robust **Streamlit** interface:
+The launcher auto-detects the best available UI. If Streamlit is installed, it uses that; otherwise it falls back to Tkinter:
 ```bash
 cd C:\github\ManannanUtils
 python launch_gui.py
 ```
-*Note: To run the lightweight native Tkinter alternative instead, use `python launch_gui.py --ui tkinter`.*
+*To explicitly choose a UI: `python launch_gui.py --ui tkinter` or `python launch_gui.py --ui streamlit`.*
 
 **2. Apply OCR Fixes (CLI):**
 ```bash

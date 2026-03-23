@@ -30,17 +30,20 @@ Before launching the lab for the first time, prepare your environment:
  
 ## 🚀 Getting Started
  
-To launch the dashboard, open your terminal and run:
+The launcher auto-detects the best available interface. If you have Streamlit installed, it opens the web UI; otherwise it falls back to the lightweight Tkinter desktop app.
  
 ```powershell
 # Navigate to the Toolkit root
 cd C:\github\ManannanUtils
  
-# Launch the Graphical UI (Defaults to Streamlit)
+# Launch (auto-detects best UI)
 python launch_gui.py
 ```
  
-*Note: The platform features two fully interchangeable interfaces powered by the same pipeline engine. You can test the desktop-native Tkinter version by running `python launch_gui.py --ui tkinter`.*
+**Choosing a specific UI:**
+- **Tkinter (zero dependencies):** `python launch_gui.py --ui tkinter`
+- **Streamlit (web UI):** `python launch_gui.py --ui streamlit`
+  - *Requires installation:* `pip install -r requirements-streamlit.txt`
 
 ---
 

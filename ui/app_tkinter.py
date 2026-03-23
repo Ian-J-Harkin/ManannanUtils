@@ -56,12 +56,17 @@ class TkinterDashboard:
         form_frame.pack(fill='x')
 
         ttk.Label(form_frame, text="Data Root Directory:").grid(row=0, column=0, sticky='w', pady=5)
-        
         self.data_root_var = tk.StringVar(value=self.engine.data_root)
-        dr_entry = ttk.Entry(form_frame, textvariable=self.data_root_var, width=60)
-        dr_entry.grid(row=0, column=1, padx=10, pady=5)
-        
+        ttk.Entry(form_frame, textvariable=self.data_root_var, width=60).grid(row=0, column=1, padx=10, pady=5)
         ttk.Button(form_frame, text="Browse...", command=self.browse_data_root).grid(row=0, column=2, pady=5)
+
+        ttk.Label(form_frame, text="Source Folder Name:").grid(row=1, column=0, sticky='w', pady=5)
+        self.old_folder_var = tk.StringVar(value=self.engine.old_folder)
+        ttk.Entry(form_frame, textvariable=self.old_folder_var, width=60).grid(row=1, column=1, padx=10, pady=5)
+
+        ttk.Label(form_frame, text="Modernized Folder Name:").grid(row=2, column=0, sticky='w', pady=5)
+        self.new_folder_var = tk.StringVar(value=self.engine.new_folder)
+        ttk.Entry(form_frame, textvariable=self.new_folder_var, width=60).grid(row=2, column=1, padx=10, pady=5)
         
         ttk.Button(self.settings_tab, text="Save Settings", command=self.save_settings).pack(pady=20, anchor='w')
 
@@ -71,8 +76,9 @@ class TkinterDashboard:
             self.data_root_var.set(d)
 
     def save_settings(self):
-        self.engine.save_config(self.data_root_var.get())
+        self.engine.save_config(self.data_root_var.get(), self.old_folder_var.get(), self.new_folder_var.get())
         messagebox.showinfo("Settings", "Workspace settings saved successfully.")
+        self.render_step_1() # Refresh step 1 labels
 
     def setup_pipeline_tab(self):
         # Wizard Indicators

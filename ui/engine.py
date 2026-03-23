@@ -10,6 +10,8 @@ class DigitizationEngine:
         self.config_file = os.path.join(self.utils_root, "workspace_config.json")
         self.report_path = os.path.join(self.utils_dir, "temp_report.json")
         self.data_root = ""
+        self.old_folder = "old-orthography"
+        self.new_folder = "new-orthography"
         self.load_config()
 
     def load_config(self):
@@ -19,17 +21,25 @@ class DigitizationEngine:
                 with open(self.config_file, "r", encoding="utf-8") as f:
                     conf = json.load(f)
                     self.data_root = conf.get("data_root", "")
+                    self.old_folder = conf.get("old_folder", "old-orthography")
+                    self.new_folder = conf.get("new_folder", "new-orthography")
             except Exception:
                 pass
         
         if not self.data_root:
             self.data_root = r"C:\github\Manannan"
 
-    def save_config(self, data_root):
+    def save_config(self, data_root, old_folder, new_folder):
         """Saves current workspace configuration persistently."""
         self.data_root = data_root
+        self.old_folder = old_folder
+        self.new_folder = new_folder
         with open(self.config_file, "w", encoding="utf-8") as f:
-            json.dump({"data_root": data_root}, f, indent=4)
+            json.dump({
+                "data_root": data_root,
+                "old_folder": old_folder,
+                "new_folder": new_folder
+            }, f, indent=4)
 
     def run_ocr_fixer(self, input_file):
         """Executes the ocr_fixer.py script. Returns (success, stdout, stderr)"""
@@ -39,7 +49,7 @@ class DigitizationEngine:
 
     def run_modernizer(self, input_file):
         """Executes the convert_orthography.py script. Returns (success, output_path, stderr)"""
-        output_path = input_file.replace("old-orthography", "new-orthography")
+        output_path = input_file.replace(self.old_folder, self.new_folder)
         cmd = [sys.executable, os.path.join(self.utils_dir, "convert_orthography.py"), input_file, "--output", output_path]
         result = subprocess.run(cmd, capture_output=True, text=True, cwd=self.utils_dir)
         return result.returncode == 0, output_path, result.stderr
@@ -56,11 +66,11 @@ class DigitizationEngine:
 
     def get_default_directory(self):
         """Returns the default directory for file selection based on current data root."""
-        return os.path.join(self.data_root, "caibidlí", "old-orthography")
+        return os.path.join(self.data_root, "caibidlí", self.old_folder)
 
     def open_output_folder(self):
         """Opens the folder containing the modernized output through the host OS."""
-        output_dir = os.path.join(self.data_root, "caibidlí", "new-orthography")
+        output_dir = os.path.join(self.data_root, "caibidlí", self.new_folder)
         if os.path.exists(output_dir):
             if sys.platform == "win32":
                 os.startfile(output_dir)
