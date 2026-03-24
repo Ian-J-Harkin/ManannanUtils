@@ -35,6 +35,12 @@ with st.sidebar:
     st.markdown("### 🔍 System Info")
     st.write(f"Python: `{sys.version.split(' ')[0]}`")
     st.write(f"Environment: `{os.path.basename(sys.prefix)}`")
+    
+    # Engine Version Badge
+    sys.path.insert(0, os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), "python-utils"))
+    from ocr_fixer import OCRFixer
+    st.sidebar.markdown(f"**Engine Version:** `v{OCRFixer.VERSION}`")
+    st.sidebar.markdown("---")
 
 # Custom Styling for Premium Wizard Look
 st.markdown("""
