@@ -66,3 +66,20 @@ def test_ambiguous_pattern_detection(mock_config):
     _, patterns = fixer.process_text(text)
     # 'test' is in ambiguous dict
     assert any(p['word'] == 'test' for p in patterns)
+
+def test_visual_noise_fixer(mock_config):
+    fixer = OCRFixer(mock_config)
+    # Ponc detaching cases
+    assert fixer.visual_noise_fixer("b.uaileadh") == "ḃuaileadh"
+    assert fixer.visual_noise_fixer("C'iandracán") == "Ċiandracán"
+    
+def test_tironian_et(mock_config):
+    fixer = OCRFixer(mock_config)
+    assert fixer.normalize_tironian_et("bhaile 7 abhaile") == "bhaile agus abhaile"
+
+def test_vowel_harmony_checker(mock_config):
+    fixer = OCRFixer(mock_config)
+    # Correct harmony across consonants
+    assert fixer.vowel_harmony_checker("cailín") == True # ai -> broad, í -> slender
+    assert fixer.vowel_harmony_checker("ciandracán") == True 
+    assert fixer.vowel_harmony_checker("fílan") == False # Slender (í) -> Consonant(l) -> Broad (a) = violation!
